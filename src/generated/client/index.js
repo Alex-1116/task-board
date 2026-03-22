@@ -151,7 +151,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/alex/Private/Project/09_BBT/task-board/src/generated/client",
+      "value": "/Users/alex/Private/Project/09_BBT/Kimi-K2.5/test-task-board/src/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -165,7 +165,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/task-board/prisma/schema.prisma",
+    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/Kimi-K2.5/test-task-board/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -182,13 +182,13 @@ const config = {
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": null,
-        "value": "file:./dev.db"
+        "fromEnvVar": "DATABASE_URL",
+        "value": null
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "c98d3a96f5bafb9af9f8ad74576d1cac158dd835824064732abc4cf21a3fb8db",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "cd71def3c232d48f3f37c332683a7cfd95ee49aa91e107b9183aeac26e77e318",
   "copyEngine": true
 }
 
