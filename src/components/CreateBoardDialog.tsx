@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -9,36 +9,36 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { createBoard } from '@/lib/actions'
-import { toast } from 'sonner'
-import { Plus } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { createBoard } from "@/lib/actions";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 export default function CreateBoardDialog() {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
+    e.preventDefault();
+    if (!name.trim()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const board = await createBoard(name)
-      toast.success('Board created successfully!')
-      setOpen(false)
-      setName('')
-      router.push(`/?boardId=${board.id}`)
-    } catch (error) {
-      toast.error('Failed to create board')
+      const board = await createBoard(name);
+      toast.success("Board created successfully!");
+      setOpen(false);
+      setName("");
+      router.push(`/?boardId=${board.id}`);
+    } catch (_error) {
+      toast.error("Failed to create board");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -50,7 +50,7 @@ export default function CreateBoardDialog() {
         <DialogHeader>
           <DialogTitle>Create New Board</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div className="space-y-2">
             <Input
               placeholder="Board Name (e.g. My Project)"
@@ -65,11 +65,11 @@ export default function CreateBoardDialog() {
               Cancel
             </Button>
             <Button type="submit" disabled={!name.trim() || loading}>
-              {loading ? 'Creating...' : 'Create'}
+              {loading ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
