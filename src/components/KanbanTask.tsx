@@ -1,65 +1,60 @@
-'use client'
+'use client';
 
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { TaskWithTags } from '@/types'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { CalendarDays, Trash2, Edit2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { deleteTask } from '@/lib/actions'
-import { toast } from 'sonner'
-import { useState } from 'react'
-import TaskDialog from './TaskDialog'
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { CalendarDays, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { deleteTask } from '@/lib/actions';
+import { TaskWithTags } from '@/types';
+
+import TaskDialog from './TaskDialog';
 
 interface KanbanTaskProps {
-  task: TaskWithTags
-  isOverlay?: boolean
+  task: TaskWithTags;
+  isOverlay?: boolean;
 }
 
 export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: {
       type: 'Task',
       task,
     },
-  })
+  });
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-  }
+  };
 
   if (isDragging) {
     return (
       <Card
         ref={setNodeRef}
         style={style}
-        className="opacity-30 border-2 border-primary border-dashed h-[100px]"
+        className="border-primary h-[100px] border-2 border-dashed opacity-30"
       />
-    )
+    );
   }
 
   const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!confirm('Delete this task?')) return
+    e.stopPropagation();
+    if (!confirm('Delete this task?')) return;
     try {
-      await deleteTask(task.id)
-      toast.success('Task deleted')
-    } catch (error) {
-      toast.error('Failed to delete task')
+      await deleteTask(task.id);
+      toast.success('Task deleted');
+    } catch (_error) {
+      toast.error('Failed to delete task');
     }
-  }
+  };
 
   return (
     <>
@@ -68,19 +63,19 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
         style={style}
         {...attributes}
         {...listeners}
-        className={`cursor-grab active:cursor-grabbing hover:border-primary/50 transition-colors group ${
-          isOverlay ? 'shadow-2xl rotate-3 scale-105 cursor-grabbing' : ''
+        className={`hover:border-primary/50 group cursor-grab transition-colors active:cursor-grabbing ${
+          isOverlay ? 'scale-105 rotate-3 cursor-grabbing shadow-2xl' : ''
         }`}
         onClick={() => setIsDialogOpen(true)}
       >
-        <CardContent className="p-3 space-y-2 relative">
-          <div className="flex justify-between items-start gap-2">
-            <p className="font-medium text-sm leading-tight">{task.title}</p>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex">
+        <CardContent className="relative space-y-2 p-3">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm leading-tight font-medium">{task.title}</p>
+            <div className="flex opacity-0 transition-opacity group-hover:opacity-100">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                className="text-muted-foreground hover:text-destructive h-6 w-6"
                 onClick={handleDelete}
               >
                 <Trash2 className="h-3 w-3" />
@@ -94,7 +89,7 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
                 <Badge
                   key={tag.id}
                   variant="outline"
-                  className="text-[10px] px-1.5 py-0"
+                  className="px-1.5 py-0 text-[10px]"
                   style={{ backgroundColor: tag.color + '20', borderColor: tag.color }}
                 >
                   {tag.name}
@@ -104,8 +99,8 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
           )}
 
           {task.dueDate && (
-            <div className="flex items-center text-xs text-muted-foreground">
-              <CalendarDays className="h-3 w-3 mr-1" />
+            <div className="text-muted-foreground flex items-center text-xs">
+              <CalendarDays className="mr-1 h-3 w-3" />
               {new Date(task.dueDate).toLocaleDateString()}
             </div>
           )}
@@ -113,12 +108,8 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
       </Card>
 
       {isDialogOpen && (
-        <TaskDialog
-          task={task}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-        />
+        <TaskDialog task={task} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       )}
     </>
-  )
+  );
 }
