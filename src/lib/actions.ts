@@ -1,14 +1,14 @@
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
-import { db } from './db'
+import { revalidatePath } from "next/cache";
+import { db } from "./db";
 
 // ================= BOARDS =================
 
 export async function getBoards() {
   return db.board.findMany({
-    orderBy: { createdAt: 'asc' },
-  })
+    orderBy: { createdAt: "asc" },
+  });
 }
 
 export async function getBoardById(id: string) {
@@ -16,16 +16,16 @@ export async function getBoardById(id: string) {
     where: { id },
     include: {
       columns: {
-        orderBy: { order: 'asc' },
+        orderBy: { order: "asc" },
         include: {
           tasks: {
-            orderBy: { order: 'asc' },
+            orderBy: { order: "asc" },
             include: { tags: true },
           },
         },
       },
     },
-  })
+  });
 }
 
 export async function createBoard(name: string) {
@@ -34,29 +34,29 @@ export async function createBoard(name: string) {
       name,
       columns: {
         create: [
-          { name: 'Todo', order: 0 },
-          { name: 'Doing', order: 1 },
-          { name: 'Done', order: 2 },
+          { name: "Todo", order: 0 },
+          { name: "Doing", order: 1 },
+          { name: "Done", order: 2 },
         ],
       },
     },
-  })
-  revalidatePath('/')
-  return board
+  });
+  revalidatePath("/");
+  return board;
 }
 
 export async function updateBoard(id: string, name: string) {
   const board = await db.board.update({
     where: { id },
     data: { name },
-  })
-  revalidatePath('/')
-  return board
+  });
+  revalidatePath("/");
+  return board;
 }
 
 export async function deleteBoard(id: string) {
-  await db.board.delete({ where: { id } })
-  revalidatePath('/')
+  await db.board.delete({ where: { id } });
+  revalidatePath("/");
 }
 
 // ================= COLUMNS =================
@@ -64,29 +64,29 @@ export async function deleteBoard(id: string) {
 export async function createColumn(boardId: string, name: string) {
   const lastColumn = await db.column.findFirst({
     where: { boardId },
-    orderBy: { order: 'desc' },
-  })
-  const order = lastColumn ? lastColumn.order + 1 : 0
+    orderBy: { order: "desc" },
+  });
+  const order = lastColumn ? lastColumn.order + 1 : 0;
 
   const column = await db.column.create({
     data: { name, boardId, order },
-  })
-  revalidatePath('/')
-  return column
+  });
+  revalidatePath("/");
+  return column;
 }
 
 export async function updateColumn(id: string, name: string) {
   const column = await db.column.update({
     where: { id },
     data: { name },
-  })
-  revalidatePath('/')
-  return column
+  });
+  revalidatePath("/");
+  return column;
 }
 
 export async function deleteColumn(id: string) {
-  await db.column.delete({ where: { id } })
-  revalidatePath('/')
+  await db.column.delete({ where: { id } });
+  revalidatePath("/");
 }
 
 export async function updateColumnOrders(updates: { id: string; order: number }[]) {
@@ -97,23 +97,23 @@ export async function updateColumnOrders(updates: { id: string; order: number }[
         data: { order: update.order },
       })
     )
-  )
-  revalidatePath('/')
+  );
+  revalidatePath("/");
 }
 
 // ================= TASKS =================
 
 export async function createTask(data: {
-  title: string
-  description?: string | null
-  columnId: string
-  dueDate?: Date | null
+  title: string;
+  description?: string | null;
+  columnId: string;
+  dueDate?: Date | null;
 }) {
   const lastTask = await db.task.findFirst({
     where: { columnId: data.columnId },
-    orderBy: { order: 'desc' },
-  })
-  const order = lastTask ? lastTask.order + 1 : 0
+    orderBy: { order: "desc" },
+  });
+  const order = lastTask ? lastTask.order + 1 : 0;
 
   const task = await db.task.create({
     data: {
@@ -123,9 +123,9 @@ export async function createTask(data: {
       dueDate: data.dueDate,
       order,
     },
-  })
-  revalidatePath('/')
-  return task
+  });
+  revalidatePath("/");
+  return task;
 }
 
 export async function updateTask(
@@ -135,19 +135,17 @@ export async function updateTask(
   const task = await db.task.update({
     where: { id },
     data,
-  })
-  revalidatePath('/')
-  return task
+  });
+  revalidatePath("/");
+  return task;
 }
 
 export async function deleteTask(id: string) {
-  await db.task.delete({ where: { id } })
-  revalidatePath('/')
+  await db.task.delete({ where: { id } });
+  revalidatePath("/");
 }
 
-export async function updateTaskOrders(
-  updates: { id: string; order: number; columnId: string }[]
-) {
+export async function updateTaskOrders(updates: { id: string; order: number; columnId: string }[]) {
   await db.$transaction(
     updates.map((update) =>
       db.task.update({
@@ -155,6 +153,6 @@ export async function updateTaskOrders(
         data: { order: update.order, columnId: update.columnId },
       })
     )
-  )
-  revalidatePath('/')
+  );
+  revalidatePath("/");
 }

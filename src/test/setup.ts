@@ -1,32 +1,32 @@
-import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
-import { afterEach, vi } from 'vitest'
+import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+});
 
-vi.mock('next/cache', () => ({
+vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
-}))
+}));
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => ({
     push: vi.fn(),
     replace: vi.fn(),
     refresh: vi.fn(),
   })),
-  usePathname: vi.fn(() => '/'),
+  usePathname: vi.fn(() => "/"),
   useSearchParams: vi.fn(() => new URLSearchParams()),
-}))
+}));
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,
@@ -38,22 +38,22 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 class MockPointerEvent extends Event {
-  button: number
-  ctrlKey: boolean
-  pointerType: string
+  button: number;
+  ctrlKey: boolean;
+  pointerType: string;
 
   constructor(type: string, props: Record<string, unknown> = {}) {
-    super(type, props)
-    this.button = (props.button as number) ?? 0
-    this.ctrlKey = (props.ctrlKey as boolean) ?? false
-    this.pointerType = (props.pointerType as string) ?? 'mouse'
+    super(type, props);
+    this.button = (props.button as number) ?? 0;
+    this.ctrlKey = (props.ctrlKey as boolean) ?? false;
+    this.pointerType = (props.pointerType as string) ?? "mouse";
   }
 }
 
-window.PointerEvent = MockPointerEvent as unknown as typeof PointerEvent
-HTMLElement.prototype.scrollIntoView = vi.fn()
-HTMLElement.prototype.hasPointerCapture = vi.fn()
-HTMLElement.prototype.releasePointerCapture = vi.fn()
+window.PointerEvent = MockPointerEvent as unknown as typeof PointerEvent;
+HTMLElement.prototype.scrollIntoView = vi.fn();
+HTMLElement.prototype.hasPointerCapture = vi.fn();
+HTMLElement.prototype.releasePointerCapture = vi.fn();

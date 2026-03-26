@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { revalidatePath } from 'next/cache'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { revalidatePath } from "next/cache";
 
-vi.mock('next/cache', () => ({
+vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
-}))
+}));
 
-vi.mock('@/lib/db', () => ({
+vi.mock("@/lib/db", () => ({
   db: {
     board: {
       findMany: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('@/lib/db', () => ({
     },
     $transaction: vi.fn((ops: Promise<unknown>[]) => Promise.all(ops)),
   },
-}))
+}));
 
 import {
   getBoards,
@@ -44,77 +44,87 @@ import {
   updateTask,
   deleteTask,
   updateTaskOrders,
-} from '@/lib/actions'
-import { db } from '@/lib/db'
+} from "@/lib/actions";
+import { db } from "@/lib/db";
 
 const mockDb = db as unknown as {
   board: {
-    findMany: ReturnType<typeof vi.fn>
-    findUnique: ReturnType<typeof vi.fn>
-    create: ReturnType<typeof vi.fn>
-    update: ReturnType<typeof vi.fn>
-    delete: ReturnType<typeof vi.fn>
-  }
+    findMany: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
   column: {
-    findFirst: ReturnType<typeof vi.fn>
-    create: ReturnType<typeof vi.fn>
-    update: ReturnType<typeof vi.fn>
-    delete: ReturnType<typeof vi.fn>
-  }
+    findFirst: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
   task: {
-    findFirst: ReturnType<typeof vi.fn>
-    create: ReturnType<typeof vi.fn>
-    update: ReturnType<typeof vi.fn>
-    delete: ReturnType<typeof vi.fn>
-  }
-  $transaction: ReturnType<typeof vi.fn>
-}
+    findFirst: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
+  $transaction: ReturnType<typeof vi.fn>;
+};
 
-describe('Board Actions', () => {
+describe("Board Actions", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
-  describe('getBoards', () => {
-    it('should return all boards ordered by createdAt', async () => {
+  describe("getBoards", () => {
+    it("should return all boards ordered by createdAt", async () => {
       const mockBoards = [
-        { id: '1', name: 'Board 1', createdAt: new Date('2024-01-01'), updatedAt: new Date('2024-01-01') },
-        { id: '2', name: 'Board 2', createdAt: new Date('2024-01-02'), updatedAt: new Date('2024-01-02') },
-      ]
-      mockDb.board.findMany.mockResolvedValue(mockBoards)
+        {
+          id: "1",
+          name: "Board 1",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-01-01"),
+        },
+        {
+          id: "2",
+          name: "Board 2",
+          createdAt: new Date("2024-01-02"),
+          updatedAt: new Date("2024-01-02"),
+        },
+      ];
+      mockDb.board.findMany.mockResolvedValue(mockBoards);
 
-      const result = await getBoards()
+      const result = await getBoards();
 
       expect(mockDb.board.findMany).toHaveBeenCalledWith({
-        orderBy: { createdAt: 'asc' },
-      })
-      expect(result).toEqual(mockBoards)
-    })
-  })
+        orderBy: { createdAt: "asc" },
+      });
+      expect(result).toEqual(mockBoards);
+    });
+  });
 
-  describe('getBoardById', () => {
-    it('should return board with columns and tasks', async () => {
+  describe("getBoardById", () => {
+    it("should return board with columns and tasks", async () => {
       const mockBoard = {
-        id: '1',
-        name: 'Test Board',
+        id: "1",
+        name: "Test Board",
         createdAt: new Date(),
         updatedAt: new Date(),
         columns: [
           {
-            id: 'col-1',
-            name: 'Todo',
+            id: "col-1",
+            name: "Todo",
             order: 0,
-            boardId: '1',
+            boardId: "1",
             createdAt: new Date(),
             updatedAt: new Date(),
             tasks: [
               {
-                id: 'task-1',
-                title: 'Task 1',
+                id: "task-1",
+                title: "Task 1",
                 description: null,
                 order: 0,
                 dueDate: null,
-                columnId: 'col-1',
+                columnId: "col-1",
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 tags: [],
@@ -122,354 +132,354 @@ describe('Board Actions', () => {
             ],
           },
         ],
-      }
-      mockDb.board.findUnique.mockResolvedValue(mockBoard)
+      };
+      mockDb.board.findUnique.mockResolvedValue(mockBoard);
 
-      const result = await getBoardById('1')
+      const result = await getBoardById("1");
 
       expect(mockDb.board.findUnique).toHaveBeenCalledWith({
-        where: { id: '1' },
+        where: { id: "1" },
         include: {
           columns: {
-            orderBy: { order: 'asc' },
+            orderBy: { order: "asc" },
             include: {
               tasks: {
-                orderBy: { order: 'asc' },
+                orderBy: { order: "asc" },
                 include: { tags: true },
               },
             },
           },
         },
-      })
-      expect(result).toEqual(mockBoard)
-    })
+      });
+      expect(result).toEqual(mockBoard);
+    });
 
-    it('should return null for non-existent board', async () => {
-      mockDb.board.findUnique.mockResolvedValue(null)
+    it("should return null for non-existent board", async () => {
+      mockDb.board.findUnique.mockResolvedValue(null);
 
-      const result = await getBoardById('non-existent')
+      const result = await getBoardById("non-existent");
 
-      expect(result).toBeNull()
-    })
-  })
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('createBoard', () => {
-    it('should create board with default columns', async () => {
+  describe("createBoard", () => {
+    it("should create board with default columns", async () => {
       const mockBoard = {
-        id: 'new-board',
-        name: 'New Board',
+        id: "new-board",
+        name: "New Board",
         createdAt: new Date(),
         updatedAt: new Date(),
-      }
-      mockDb.board.create.mockResolvedValue(mockBoard)
+      };
+      mockDb.board.create.mockResolvedValue(mockBoard);
 
-      const result = await createBoard('New Board')
+      const result = await createBoard("New Board");
 
       expect(mockDb.board.create).toHaveBeenCalledWith({
         data: {
-          name: 'New Board',
+          name: "New Board",
           columns: {
             create: [
-              { name: 'Todo', order: 0 },
-              { name: 'Doing', order: 1 },
-              { name: 'Done', order: 2 },
+              { name: "Todo", order: 0 },
+              { name: "Doing", order: 1 },
+              { name: "Done", order: 2 },
             ],
           },
         },
-      })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-      expect(result).toEqual(mockBoard)
-    })
-  })
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+      expect(result).toEqual(mockBoard);
+    });
+  });
 
-  describe('updateBoard', () => {
-    it('should update board name', async () => {
+  describe("updateBoard", () => {
+    it("should update board name", async () => {
       const mockBoard = {
-        id: '1',
-        name: 'Updated Name',
+        id: "1",
+        name: "Updated Name",
         createdAt: new Date(),
         updatedAt: new Date(),
-      }
-      mockDb.board.update.mockResolvedValue(mockBoard)
+      };
+      mockDb.board.update.mockResolvedValue(mockBoard);
 
-      const result = await updateBoard('1', 'Updated Name')
+      const result = await updateBoard("1", "Updated Name");
 
       expect(mockDb.board.update).toHaveBeenCalledWith({
-        where: { id: '1' },
-        data: { name: 'Updated Name' },
-      })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-      expect(result).toEqual(mockBoard)
-    })
-  })
+        where: { id: "1" },
+        data: { name: "Updated Name" },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+      expect(result).toEqual(mockBoard);
+    });
+  });
 
-  describe('deleteBoard', () => {
-    it('should delete board', async () => {
-      mockDb.board.delete.mockResolvedValue({ id: '1' })
+  describe("deleteBoard", () => {
+    it("should delete board", async () => {
+      mockDb.board.delete.mockResolvedValue({ id: "1" });
 
-      await deleteBoard('1')
+      await deleteBoard("1");
 
-      expect(mockDb.board.delete).toHaveBeenCalledWith({ where: { id: '1' } })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-    })
-  })
-})
+      expect(mockDb.board.delete).toHaveBeenCalledWith({ where: { id: "1" } });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+    });
+  });
+});
 
-describe('Column Actions', () => {
+describe("Column Actions", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
-  describe('createColumn', () => {
-    it('should create column with correct order', async () => {
-      mockDb.column.findFirst.mockResolvedValue({ order: 2 })
+  describe("createColumn", () => {
+    it("should create column with correct order", async () => {
+      mockDb.column.findFirst.mockResolvedValue({ order: 2 });
       mockDb.column.create.mockResolvedValue({
-        id: 'new-col',
-        name: 'New Column',
+        id: "new-col",
+        name: "New Column",
         order: 3,
-        boardId: 'board-1',
+        boardId: "board-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
-      const result = await createColumn('board-1', 'New Column')
+      const result = await createColumn("board-1", "New Column");
 
       expect(mockDb.column.findFirst).toHaveBeenCalledWith({
-        where: { boardId: 'board-1' },
-        orderBy: { order: 'desc' },
-      })
+        where: { boardId: "board-1" },
+        orderBy: { order: "desc" },
+      });
       expect(mockDb.column.create).toHaveBeenCalledWith({
-        data: { name: 'New Column', boardId: 'board-1', order: 3 },
-      })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-      expect(result.name).toBe('New Column')
-    })
+        data: { name: "New Column", boardId: "board-1", order: 3 },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+      expect(result.name).toBe("New Column");
+    });
 
-    it('should create first column with order 0', async () => {
-      mockDb.column.findFirst.mockResolvedValue(null)
+    it("should create first column with order 0", async () => {
+      mockDb.column.findFirst.mockResolvedValue(null);
       mockDb.column.create.mockResolvedValue({
-        id: 'new-col',
-        name: 'First Column',
+        id: "new-col",
+        name: "First Column",
         order: 0,
-        boardId: 'board-1',
+        boardId: "board-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
-      const result = await createColumn('board-1', 'First Column')
+      const result = await createColumn("board-1", "First Column");
 
-      expect(result.order).toBe(0)
-    })
-  })
+      expect(result.order).toBe(0);
+    });
+  });
 
-  describe('updateColumn', () => {
-    it('should update column name', async () => {
+  describe("updateColumn", () => {
+    it("should update column name", async () => {
       mockDb.column.update.mockResolvedValue({
-        id: 'col-1',
-        name: 'Updated Column',
+        id: "col-1",
+        name: "Updated Column",
         order: 0,
-        boardId: 'board-1',
+        boardId: "board-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
-      const result = await updateColumn('col-1', 'Updated Column')
+      const result = await updateColumn("col-1", "Updated Column");
 
       expect(mockDb.column.update).toHaveBeenCalledWith({
-        where: { id: 'col-1' },
-        data: { name: 'Updated Column' },
-      })
-      expect(result.name).toBe('Updated Column')
-    })
-  })
+        where: { id: "col-1" },
+        data: { name: "Updated Column" },
+      });
+      expect(result.name).toBe("Updated Column");
+    });
+  });
 
-  describe('deleteColumn', () => {
-    it('should delete column', async () => {
-      mockDb.column.delete.mockResolvedValue({ id: 'col-1' })
+  describe("deleteColumn", () => {
+    it("should delete column", async () => {
+      mockDb.column.delete.mockResolvedValue({ id: "col-1" });
 
-      await deleteColumn('col-1')
+      await deleteColumn("col-1");
 
-      expect(mockDb.column.delete).toHaveBeenCalledWith({ where: { id: 'col-1' } })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-    })
-  })
+      expect(mockDb.column.delete).toHaveBeenCalledWith({ where: { id: "col-1" } });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+    });
+  });
 
-  describe('updateColumnOrders', () => {
-    it('should update multiple column orders in transaction', async () => {
+  describe("updateColumnOrders", () => {
+    it("should update multiple column orders in transaction", async () => {
       const updates = [
-        { id: 'col-1', order: 1 },
-        { id: 'col-2', order: 0 },
-      ]
-      mockDb.$transaction.mockResolvedValue([{}, {}])
-      mockDb.column.update.mockResolvedValue({})
+        { id: "col-1", order: 1 },
+        { id: "col-2", order: 0 },
+      ];
+      mockDb.$transaction.mockResolvedValue([{}, {}]);
+      mockDb.column.update.mockResolvedValue({});
 
-      await updateColumnOrders(updates)
+      await updateColumnOrders(updates);
 
-      expect(mockDb.$transaction).toHaveBeenCalled()
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-    })
-  })
-})
+      expect(mockDb.$transaction).toHaveBeenCalled();
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+    });
+  });
+});
 
-describe('Task Actions', () => {
+describe("Task Actions", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
-  describe('createTask', () => {
-    it('should create task with correct order', async () => {
-      mockDb.task.findFirst.mockResolvedValue({ order: 5 })
+  describe("createTask", () => {
+    it("should create task with correct order", async () => {
+      mockDb.task.findFirst.mockResolvedValue({ order: 5 });
       mockDb.task.create.mockResolvedValue({
-        id: 'new-task',
-        title: 'New Task',
+        id: "new-task",
+        title: "New Task",
         description: null,
         order: 6,
         dueDate: null,
-        columnId: 'col-1',
+        columnId: "col-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
       const result = await createTask({
-        title: 'New Task',
-        columnId: 'col-1',
-      })
+        title: "New Task",
+        columnId: "col-1",
+      });
 
       expect(mockDb.task.findFirst).toHaveBeenCalledWith({
-        where: { columnId: 'col-1' },
-        orderBy: { order: 'desc' },
-      })
+        where: { columnId: "col-1" },
+        orderBy: { order: "desc" },
+      });
       expect(mockDb.task.create).toHaveBeenCalledWith({
         data: {
-          title: 'New Task',
+          title: "New Task",
           description: undefined,
-          columnId: 'col-1',
+          columnId: "col-1",
           dueDate: undefined,
           order: 6,
         },
-      })
-      expect(result.title).toBe('New Task')
-    })
+      });
+      expect(result.title).toBe("New Task");
+    });
 
-    it('should create first task with order 0', async () => {
-      mockDb.task.findFirst.mockResolvedValue(null)
+    it("should create first task with order 0", async () => {
+      mockDb.task.findFirst.mockResolvedValue(null);
       mockDb.task.create.mockResolvedValue({
-        id: 'new-task',
-        title: 'First Task',
+        id: "new-task",
+        title: "First Task",
         description: null,
         order: 0,
         dueDate: null,
-        columnId: 'col-1',
+        columnId: "col-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
       const result = await createTask({
-        title: 'First Task',
-        columnId: 'col-1',
-      })
+        title: "First Task",
+        columnId: "col-1",
+      });
 
-      expect(result.order).toBe(0)
-    })
+      expect(result.order).toBe(0);
+    });
 
-    it('should create task with description and due date', async () => {
-      const dueDate = new Date('2024-12-31')
-      mockDb.task.findFirst.mockResolvedValue(null)
+    it("should create task with description and due date", async () => {
+      const dueDate = new Date("2024-12-31");
+      mockDb.task.findFirst.mockResolvedValue(null);
       mockDb.task.create.mockResolvedValue({
-        id: 'new-task',
-        title: 'Task with details',
-        description: 'Description here',
+        id: "new-task",
+        title: "Task with details",
+        description: "Description here",
         order: 0,
         dueDate,
-        columnId: 'col-1',
+        columnId: "col-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
       const result = await createTask({
-        title: 'Task with details',
-        description: 'Description here',
-        columnId: 'col-1',
+        title: "Task with details",
+        description: "Description here",
+        columnId: "col-1",
         dueDate,
-      })
+      });
 
       expect(mockDb.task.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          description: 'Description here',
+          description: "Description here",
           dueDate,
         }),
-      })
-    })
-  })
+      });
+    });
+  });
 
-  describe('updateTask', () => {
-    it('should update task title', async () => {
+  describe("updateTask", () => {
+    it("should update task title", async () => {
       mockDb.task.update.mockResolvedValue({
-        id: 'task-1',
-        title: 'Updated Title',
+        id: "task-1",
+        title: "Updated Title",
         description: null,
         order: 0,
         dueDate: null,
-        columnId: 'col-1',
+        columnId: "col-1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
-      const result = await updateTask('task-1', { title: 'Updated Title' })
+      const result = await updateTask("task-1", { title: "Updated Title" });
 
       expect(mockDb.task.update).toHaveBeenCalledWith({
-        where: { id: 'task-1' },
-        data: { title: 'Updated Title' },
-      })
-      expect(result.title).toBe('Updated Title')
-    })
+        where: { id: "task-1" },
+        data: { title: "Updated Title" },
+      });
+      expect(result.title).toBe("Updated Title");
+    });
 
-    it('should move task to different column', async () => {
+    it("should move task to different column", async () => {
       mockDb.task.update.mockResolvedValue({
-        id: 'task-1',
-        title: 'Task',
+        id: "task-1",
+        title: "Task",
         description: null,
         order: 0,
         dueDate: null,
-        columnId: 'col-2',
+        columnId: "col-2",
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      });
 
-      const result = await updateTask('task-1', { columnId: 'col-2' })
+      const result = await updateTask("task-1", { columnId: "col-2" });
 
       expect(mockDb.task.update).toHaveBeenCalledWith({
-        where: { id: 'task-1' },
-        data: { columnId: 'col-2' },
-      })
-      expect(result.columnId).toBe('col-2')
-    })
-  })
+        where: { id: "task-1" },
+        data: { columnId: "col-2" },
+      });
+      expect(result.columnId).toBe("col-2");
+    });
+  });
 
-  describe('deleteTask', () => {
-    it('should delete task', async () => {
-      mockDb.task.delete.mockResolvedValue({ id: 'task-1' })
+  describe("deleteTask", () => {
+    it("should delete task", async () => {
+      mockDb.task.delete.mockResolvedValue({ id: "task-1" });
 
-      await deleteTask('task-1')
+      await deleteTask("task-1");
 
-      expect(mockDb.task.delete).toHaveBeenCalledWith({ where: { id: 'task-1' } })
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-    })
-  })
+      expect(mockDb.task.delete).toHaveBeenCalledWith({ where: { id: "task-1" } });
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+    });
+  });
 
-  describe('updateTaskOrders', () => {
-    it('should update multiple task orders in transaction', async () => {
+  describe("updateTaskOrders", () => {
+    it("should update multiple task orders in transaction", async () => {
       const updates = [
-        { id: 'task-1', order: 1, columnId: 'col-1' },
-        { id: 'task-2', order: 0, columnId: 'col-1' },
-      ]
-      mockDb.$transaction.mockResolvedValue([{}, {}])
-      mockDb.task.update.mockResolvedValue({})
+        { id: "task-1", order: 1, columnId: "col-1" },
+        { id: "task-2", order: 0, columnId: "col-1" },
+      ];
+      mockDb.$transaction.mockResolvedValue([{}, {}]);
+      mockDb.task.update.mockResolvedValue({});
 
-      await updateTaskOrders(updates)
+      await updateTaskOrders(updates);
 
-      expect(mockDb.$transaction).toHaveBeenCalled()
-      expect(revalidatePath).toHaveBeenCalledWith('/')
-    })
-  })
-})
+      expect(mockDb.$transaction).toHaveBeenCalled();
+      expect(revalidatePath).toHaveBeenCalledWith("/");
+    });
+  });
+});

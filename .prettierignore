@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+build
+dist
+pnpm-lock.yaml
+src/generated
+*.db
+*.db-journal
+playwright-report
+test-results
+coverage
+.next-env.d.ts
