@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.*
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Generated files
+src/generated
+prisma/migrations
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Misc
+*.log
+.DS_Store
+.env*
+coverage
+playwright-report
+test-results
