@@ -1,44 +1,37 @@
-'use client'
+'use client';
 
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { TaskWithTags } from '@/types'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { CalendarDays, Trash2, Edit2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { deleteTask } from '@/lib/actions'
-import { toast } from 'sonner'
-import { useState } from 'react'
-import TaskDialog from './TaskDialog'
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { TaskWithTags } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { deleteTask } from '@/lib/actions';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import TaskDialog from './TaskDialog';
 
 interface KanbanTaskProps {
-  task: TaskWithTags
-  isOverlay?: boolean
+  task: TaskWithTags;
+  isOverlay?: boolean;
 }
 
 export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: {
       type: 'Task',
       task,
     },
-  })
+  });
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-  }
+  };
 
   if (isDragging) {
     return (
@@ -47,19 +40,19 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
         style={style}
         className="opacity-30 border-2 border-primary border-dashed h-[100px]"
       />
-    )
+    );
   }
 
   const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!confirm('Delete this task?')) return
+    e.stopPropagation();
+    if (!confirm('Delete this task?')) return;
     try {
-      await deleteTask(task.id)
-      toast.success('Task deleted')
-    } catch (error) {
-      toast.error('Failed to delete task')
+      await deleteTask(task.id);
+      toast.success('Task deleted');
+    } catch (_error) {
+      toast.error('Failed to delete task');
     }
-  }
+  };
 
   return (
     <>
@@ -113,12 +106,8 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
       </Card>
 
       {isDialogOpen && (
-        <TaskDialog
-          task={task}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-        />
+        <TaskDialog task={task} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       )}
     </>
-  )
+  );
 }

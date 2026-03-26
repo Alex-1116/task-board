@@ -31,6 +31,9 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm exec prisma generate
 
+      - name: Check Formatting
+        run: pnpm format:check
+
       - name: Run Lint
         run: pnpm lint
 

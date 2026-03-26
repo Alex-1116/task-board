@@ -1,48 +1,41 @@
-'use client'
+'use client';
 
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { ColumnWithTasks } from '@/types'
-import KanbanTask from './KanbanTask'
-import { Button } from '@/components/ui/button'
-import { MoreHorizontal, Plus, Trash2 } from 'lucide-react'
-import { useMemo } from 'react'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { ColumnWithTasks } from '@/types';
+import KanbanTask from './KanbanTask';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import { useMemo } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { deleteColumn, createTask } from '@/lib/actions'
-import { toast } from 'sonner'
+} from '@/components/ui/dropdown-menu';
+import { deleteColumn, createTask } from '@/lib/actions';
+import { toast } from 'sonner';
 
 interface KanbanColumnProps {
-  column: ColumnWithTasks
-  isOverlay?: boolean
+  column: ColumnWithTasks;
+  isOverlay?: boolean;
 }
 
 export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: column.id,
     data: {
       type: 'Column',
       column,
     },
-  })
+  });
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-  }
+  };
 
-  const tasksIds = useMemo(() => column.tasks.map((t) => t.id), [column.tasks])
+  const tasksIds = useMemo(() => column.tasks.map((t) => t.id), [column.tasks]);
 
   if (isDragging) {
     return (
@@ -51,29 +44,29 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
         style={style}
         className="bg-card/50 opacity-40 border-2 border-primary rounded-lg w-[300px] h-[500px] shrink-0"
       />
-    )
+    );
   }
 
   const handleDelete = async () => {
-    if (!confirm('Delete this column and all its tasks?')) return
+    if (!confirm('Delete this column and all its tasks?')) return;
     try {
-      await deleteColumn(column.id)
-      toast.success('Column deleted')
-    } catch (error) {
-      toast.error('Failed to delete column')
+      await deleteColumn(column.id);
+      toast.success('Column deleted');
+    } catch (_error) {
+      toast.error('Failed to delete column');
     }
-  }
+  };
 
   const handleAddTask = async () => {
-    const title = prompt('Task title:')
-    if (!title) return
+    const title = prompt('Task title:');
+    if (!title) return;
     try {
-      await createTask({ title, columnId: column.id })
-      toast.success('Task created')
-    } catch (error) {
-      toast.error('Failed to create task')
+      await createTask({ title, columnId: column.id });
+      toast.success('Task created');
+    } catch (_error) {
+      toast.error('Failed to create task');
     }
-  }
+  };
 
   return (
     <div
@@ -94,7 +87,7 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
             {column.tasks.length}
           </span>
         </div>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="h-8 w-8" />}>
             <MoreHorizontal className="w-4 h-4" />
@@ -117,11 +110,15 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
       </div>
 
       <div className="p-3 border-t">
-        <Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={handleAddTask}>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-muted-foreground"
+          onClick={handleAddTask}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Task
         </Button>
       </div>
     </div>
-  )
+  );
 }

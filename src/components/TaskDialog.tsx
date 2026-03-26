@@ -1,50 +1,52 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { TaskWithTags } from '@/types'
+import { useState } from 'react';
+import { TaskWithTags } from '@/types';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { updateTask } from '@/lib/actions'
-import { toast } from 'sonner'
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { updateTask } from '@/lib/actions';
+import { toast } from 'sonner';
 
 interface TaskDialogProps {
-  task: TaskWithTags
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  task: TaskWithTags;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export default function TaskDialog({ task, open, onOpenChange }: TaskDialogProps) {
-  const [title, setTitle] = useState(task.title)
-  const [description, setDescription] = useState(task.description || '')
-  const [dueDate, setDueDate] = useState(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '')
-  const [loading, setLoading] = useState(false)
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description || '');
+  const [dueDate, setDueDate] = useState(
+    task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''
+  );
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) return
+    e.preventDefault();
+    if (!title.trim()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       await updateTask(task.id, {
         title,
         description,
         dueDate: dueDate ? new Date(dueDate) : null,
-      })
-      toast.success('Task updated')
-      onOpenChange(false)
-    } catch (error) {
-      toast.error('Failed to update task')
+      });
+      toast.success('Task updated');
+      onOpenChange(false);
+    } catch (_error) {
+      toast.error('Failed to update task');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,11 +76,7 @@ export default function TaskDialog({ task, open, onOpenChange }: TaskDialogProps
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Due Date</label>
-            <Input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-            />
+            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -91,5 +89,5 @@ export default function TaskDialog({ task, open, onOpenChange }: TaskDialogProps
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
