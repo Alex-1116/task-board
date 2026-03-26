@@ -150,7 +150,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/alex/Private/Project/09_BBT/task-board/src/generated/client",
+      "value": "/Users/alex/Private/Project/09_BBT/Dogfood-2.1.1/devops-task-board/src/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -161,15 +161,22 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/task-board/prisma/schema.prisma",
+    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/Dogfood-2.1.1/devops-task-board/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
@@ -178,6 +185,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -186,8 +194,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "c98d3a96f5bafb9af9f8ad74576d1cac158dd835824064732abc4cf21a3fb8db",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/client\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\", \"linux-musl-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "9203dfe4f2b42b7af3a36e969708ce3a452a236cd75951584d83670ec27001f2",
   "copyEngine": true
 }
 config.dirname = '/'
