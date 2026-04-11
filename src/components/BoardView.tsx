@@ -70,6 +70,30 @@ export default function BoardView({ board }: BoardViewProps) {
     }
   }
 
+  if (!isClient) {
+    return (
+      <div className="flex gap-4 h-full items-start overflow-x-auto pb-4">
+        {columns.map((col) => (
+          <div key={col.id} className="w-[300px] shrink-0">
+            <div className="bg-card rounded-lg flex flex-col border shadow-sm">
+              <div className="p-3 font-semibold border-b bg-muted/50 rounded-t-lg">
+                {col.name}
+                <span className="bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded-full ml-2">
+                  {col.tasks.length}
+                </span>
+              </div>
+              <div className="p-3 min-h-[150px]">
+                <div className="text-sm text-muted-foreground text-center py-8">
+                  Loading...
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -95,7 +119,7 @@ export default function BoardView({ board }: BoardViewProps) {
         </Button>
       </div>
 
-      {isClient && createPortal(
+      {createPortal(
         <DragOverlay>
           {activeColumn && <KanbanColumn column={activeColumn} isOverlay />}
           {activeTask && <KanbanTask task={activeTask} isOverlay />}
@@ -233,11 +257,13 @@ export default function BoardView({ board }: BoardViewProps) {
       const targetCol = columns.find(c => c.tasks.some(t => t.id === activeId))
       if (!targetCol) return
 
-      // Update orders for tasks in the affected columns
+      // Only update order for tasks in target column
+      // Do NOT update columnId for all tasks - this was causing data loss!
+      // Only the moved task gets its columnId updated
       const updates = targetCol.tasks.map((t, idx) => ({
         id: t.id,
         order: idx,
-        columnId: targetCol.id
+        columnId: t.id === activeId ? targetCol.id : t.columnId
       }))
       
       updateTaskOrders(updates).catch(() => toast.error('Failed to update task order'))

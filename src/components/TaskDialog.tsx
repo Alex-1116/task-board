@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { TaskWithTags } from '@/types'
 import {
   Dialog,
@@ -25,6 +26,7 @@ export default function TaskDialog({ task, open, onOpenChange }: TaskDialogProps
   const [description, setDescription] = useState(task.description || '')
   const [dueDate, setDueDate] = useState(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '')
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,6 +41,7 @@ export default function TaskDialog({ task, open, onOpenChange }: TaskDialogProps
       })
       toast.success('Task updated')
       onOpenChange(false)
+      router.refresh()
     } catch (error) {
       toast.error('Failed to update task')
     } finally {
