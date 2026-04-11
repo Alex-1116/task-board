@@ -151,7 +151,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/alex/Private/Project/09_BBT/task-board/src/generated/client",
+      "value": "/Users/alex/Private/Project/09_BBT/do/Kimi-K2.5/feat-task-board/src/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -169,12 +169,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/task-board/prisma/schema.prisma",
+    "sourceFilePath": "/Users/alex/Private/Project/09_BBT/do/Kimi-K2.5/feat-task-board/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
@@ -183,7 +182,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
