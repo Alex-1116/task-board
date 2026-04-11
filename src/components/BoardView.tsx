@@ -22,11 +22,14 @@ import {
 import { BoardWithColumns, ColumnWithTasks, TaskWithTags } from '@/types'
 import KanbanColumn from './KanbanColumn'
 import KanbanTask from './KanbanTask'
+import GanttView from './GanttView'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, LayoutGrid, GanttChart } from 'lucide-react'
 import { createColumn, updateColumnOrders, updateTaskOrders } from '@/lib/actions'
 import { toast } from 'sonner'
+
+type ViewMode = 'kanban' | 'gantt'
 
 interface BoardViewProps {
   board: BoardWithColumns
@@ -37,6 +40,7 @@ export default function BoardView({ board }: BoardViewProps) {
   const [activeColumn, setActiveColumn] = useState<ColumnWithTasks | null>(null)
   const [activeTask, setActiveTask] = useState<TaskWithTags | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('kanban')
 
   useEffect(() => {
     setColumns(board.columns)
@@ -65,44 +69,100 @@ export default function BoardView({ board }: BoardViewProps) {
     try {
       await createColumn(board.id, name)
       toast.success('Column added')
-    } catch (error) {
+    } catch {
       toast.error('Failed to add column')
     }
   }
 
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragEnd={onDragEnd}
-    >
-      <div className="flex gap-4 h-full items-start overflow-x-auto pb-4">
-        <SortableContext items={columnsId} strategy={horizontalListSortingStrategy}>
-          {columns.map((col) => (
-            <KanbanColumn key={col.id} column={col} />
-          ))}
-        </SortableContext>
-
-        <Button
-          variant="outline"
-          className="h-[60px] w-[300px] shrink-0 border-dashed bg-muted/50"
-          onClick={handleAddColumn}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Column
-        </Button>
+  // 甘特图视图
+  if (viewMode === 'gantt') {
+    return (
+      <div className="h-full flex flex-col">
+        {/* 视图切换按钮 */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode('kanban')}
+            >
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              看板视图
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setViewMode('gantt')}
+            >
+              <GanttChart className="w-4 h-4 mr-2" />
+              甘特图视图
+            </Button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <GanttView board={board} />
+        </div>
       </div>
+    )
+  }
 
-      {isClient && createPortal(
-        <DragOverlay>
-          {activeColumn && <KanbanColumn column={activeColumn} isOverlay />}
-          {activeTask && <KanbanTask task={activeTask} isOverlay />}
-        </DragOverlay>,
-        document.body
-      )}
-    </DndContext>
+  // 看板视图
+  return (
+    <div className="h-full flex flex-col">
+      {/* 视图切换按钮 */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setViewMode('kanban')}
+          >
+            <LayoutGrid className="w-4 h-4 mr-2" />
+            看板视图
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewMode('gantt')}
+          >
+            <GanttChart className="w-4 h-4 mr-2" />
+            甘特图视图
+          </Button>
+        </div>
+      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+      >
+        <div className="flex gap-4 h-full items-start overflow-x-auto pb-4">
+          <SortableContext items={columnsId} strategy={horizontalListSortingStrategy}>
+            {columns.map((col) => (
+              <KanbanColumn key={col.id} column={col} />
+            ))}
+          </SortableContext>
+
+          <Button
+            variant="outline"
+            className="h-[60px] w-[300px] shrink-0 border-dashed bg-muted/50"
+            onClick={handleAddColumn}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Column
+          </Button>
+        </div>
+
+        {isClient && createPortal(
+          <DragOverlay>
+            {activeColumn && <KanbanColumn column={activeColumn} isOverlay />}
+            {activeTask && <KanbanTask task={activeTask} isOverlay />}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
+    </div>
   )
 
   function onDragStart(event: DragStartEvent) {
