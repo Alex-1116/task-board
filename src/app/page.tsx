@@ -2,7 +2,7 @@ import { getBoards, getBoardById } from '@/lib/actions'
 import { redirect } from 'next/navigation'
 import CreateBoardDialog from '@/components/CreateBoardDialog'
 import BoardSwitcher from '@/components/BoardSwitcher'
-import BoardView from '@/components/BoardView'
+import ViewContainer from '@/components/ViewContainer'
 
 export default async function Home(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -45,7 +45,7 @@ export default async function Home(props: {
       </header>
       
       <main className="flex-1 overflow-auto p-6">
-        <BoardView board={currentBoard} />
+        <ViewContainer board={currentBoard} />
       </main>
     </div>
   )
