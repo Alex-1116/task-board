@@ -162,6 +162,10 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -179,6 +183,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -187,8 +192,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "c98d3a96f5bafb9af9f8ad74576d1cac158dd835824064732abc4cf21a3fb8db",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/client\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  columns   Column[]\n}\n\nmodel Column {\n  id        String   @id @default(cuid())\n  name      String\n  order     Int      @default(0)\n  boardId   String\n  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  tasks     Task[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Task {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  order       Int       @default(0)\n  dueDate     DateTime?\n  columnId    String\n  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)\n  tags        Tag[]     @relation(\"TaskTags\")\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String\n  color     String   @default(\"#e2e8f0\")\n  tasks     Task[]   @relation(\"TaskTags\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "b97ed46f50003151c137ef23f61951833757acc5444986ecf81ae4e461b8c885",
   "copyEngine": true
 }
 
@@ -228,6 +233,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-darwin.dylib.node");
 path.join(process.cwd(), "src/generated/client/libquery_engine-darwin.dylib.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/generated/client/libquery_engine-debian-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "src/generated/client/schema.prisma")
