@@ -9,7 +9,8 @@ import { CalendarDays, Trash2, Edit2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { deleteTask } from '@/lib/actions'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import TaskDialog from './TaskDialog'
 
 interface KanbanTaskProps {
@@ -19,6 +20,12 @@ interface KanbanTaskProps {
 
 export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const {
     setNodeRef,
@@ -33,6 +40,7 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
       type: 'Task',
       task,
     },
+    disabled: !isMounted,
   })
 
   const style = {
@@ -56,6 +64,7 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
     try {
       await deleteTask(task.id)
       toast.success('Task deleted')
+      router.refresh()
     } catch (error) {
       toast.error('Failed to delete task')
     }
@@ -66,11 +75,11 @@ export default function KanbanTask({ task, isOverlay }: KanbanTaskProps) {
       <Card
         ref={setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
-        className={`cursor-grab active:cursor-grabbing hover:border-primary/50 transition-colors group ${
-          isOverlay ? 'shadow-2xl rotate-3 scale-105 cursor-grabbing' : ''
-        }`}
+        {...(isMounted ? attributes : {})}
+        {...(isMounted ? listeners : {})}
+        className={`hover:border-primary/50 transition-colors group ${
+          isMounted ? 'cursor-grab active:cursor-grabbing' : ''
+        } ${isOverlay ? 'shadow-2xl rotate-3 scale-105 cursor-grabbing' : ''}`}
         onClick={() => setIsDialogOpen(true)}
       >
         <CardContent className="p-3 space-y-2 relative">

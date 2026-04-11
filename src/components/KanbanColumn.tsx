@@ -6,7 +6,8 @@ import { ColumnWithTasks } from '@/types'
 import KanbanTask from './KanbanTask'
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal, Plus, Trash2 } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,13 @@ interface KanbanColumnProps {
 }
 
 export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
+  const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   const {
     setNodeRef,
     attributes,
@@ -35,6 +43,7 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
       type: 'Column',
       column,
     },
+    disabled: !isMounted,
   })
 
   const style = {
@@ -70,6 +79,7 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
     try {
       await createTask({ title, columnId: column.id })
       toast.success('Task created')
+      router.refresh()
     } catch (error) {
       toast.error('Failed to create task')
     }
@@ -84,9 +94,11 @@ export default function KanbanColumn({ column, isOverlay }: KanbanColumnProps) {
       }`}
     >
       <div
-        {...attributes}
-        {...listeners}
-        className="p-3 font-semibold flex items-center justify-between border-b cursor-grab active:cursor-grabbing bg-muted/50 rounded-t-lg"
+        {...(isMounted ? attributes : {})}
+        {...(isMounted ? listeners : {})}
+        className={`p-3 font-semibold flex items-center justify-between border-b bg-muted/50 rounded-t-lg ${
+          isMounted ? 'cursor-grab active:cursor-grabbing' : ''
+        }`}
       >
         <div className="flex items-center gap-2">
           <span>{column.name}</span>

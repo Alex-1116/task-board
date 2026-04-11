@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import CreateBoardDialog from '@/components/CreateBoardDialog'
 import BoardSwitcher from '@/components/BoardSwitcher'
 import BoardView from '@/components/BoardView'
+import GanttView from '@/components/GanttView'
+import { BoardWithColumns } from '@/types'
+import ViewSwitcher from '@/components/ViewSwitcher'
 
 export default async function Home(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -23,13 +26,15 @@ export default async function Home(props: {
   }
 
   const boardId = searchParams.boardId as string
+  const view = (searchParams.view as string) || 'kanban'
+  
   if (!boardId || !boards.find(b => b.id === boardId)) {
-    redirect(`/?boardId=${boards[0].id}`)
+    redirect(`/?boardId=${boards[0].id}&view=${view}`)
   }
 
   const currentBoard = await getBoardById(boardId)
   if (!currentBoard) {
-    redirect(`/?boardId=${boards[0].id}`)
+    redirect(`/?boardId=${boards[0].id}&view=${view}`)
   }
 
   return (
@@ -39,13 +44,17 @@ export default async function Home(props: {
           <h1 className="text-xl font-bold">Task Board</h1>
           <BoardSwitcher boards={boards} currentBoardId={boardId} />
         </div>
-        <div className="flex items-center gap-2">
-          {/* Header actions */}
-        </div>
+        <ViewSwitcher boardId={boardId} currentView={view} />
       </header>
       
-      <main className="flex-1 overflow-auto p-6">
-        <BoardView board={currentBoard} />
+      <main className="flex-1 overflow-hidden">
+        {view === 'kanban' ? (
+          <div className="h-full overflow-auto p-6">
+            <BoardView board={currentBoard} />
+          </div>
+        ) : (
+          <GanttView board={currentBoard} />
+        )}
       </main>
     </div>
   )
